@@ -38,15 +38,6 @@ spec:
       - name: {{ . | quote }}
     {{- end }}
     {{- end }}
-      initContainers:
-      - name: init
-        image: busybox:1.31.0
-        imagePullPolicy: IfNotPresent
-        args:
-        - /bin/sh
-        - -c
-        - |
-          mkdir -p /etc/clickhouse-server/metrica.d
       containers:
       - name: {{ include "clickhouse.fullname" . }}
         image: {{ .Values.clickhouse.image }}:{{ .Values.clickhouse.imageVersion }}
