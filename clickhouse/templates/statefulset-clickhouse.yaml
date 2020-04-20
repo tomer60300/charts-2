@@ -90,8 +90,6 @@ spec:
         - name: {{ include "clickhouse.fullname" . }}-users
           mountPath: /etc/clickhouse-server/users.d
         securityContext:
-          privileged: true
-          runAsUser: 0
     {{- if .Values.clickhouse.imagePullSecrets }}
       imagePullSecrets: 
       - name: {{ .Values.clickhouse.imagePullSecrets }}
