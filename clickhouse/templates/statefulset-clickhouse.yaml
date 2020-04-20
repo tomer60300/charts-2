@@ -89,7 +89,6 @@ spec:
           mountPath: /etc/clickhouse-server/metrica.d
         - name: {{ include "clickhouse.fullname" . }}-users
           mountPath: /etc/clickhouse-server/users.d
-        securityContext:
     {{- if .Values.clickhouse.imagePullSecrets }}
       imagePullSecrets: 
       - name: {{ .Values.clickhouse.imagePullSecrets }}
