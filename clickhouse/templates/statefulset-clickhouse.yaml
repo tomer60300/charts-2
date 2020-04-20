@@ -81,15 +81,6 @@ spec:
         - name: {{ include "clickhouse.fullname" . }}-users
           mountPath: /etc/clickhouse-server/users.d
         {{- if .Values.clickhouse.readinessProbe.enabled }}
-        securityContext:
-          capabilities:
-            drop:
-              - KILL
-              - MKNOD
-              - SETGID
-              - SETUID
-          runAsUser: 1001090000
-          privileged: true
     {{- if .Values.clickhouse.imagePullSecrets }}
       imagePullSecrets: 
       - name: {{ .Values.clickhouse.imagePullSecrets }}
