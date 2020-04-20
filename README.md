@@ -6,7 +6,7 @@
 This chart bootstraps a [ClickHouse](https://clickhouse.yandex/) replication cluster deployment on a [Kubernetes](http://kubernetes.io) cluster using the [Helm](https://helm.sh) package manager.
 
 ## Prerequisites
-
+1
 - Kubernetes 1.10+
 - PV provisioner support in the underlying infrastructure
 
