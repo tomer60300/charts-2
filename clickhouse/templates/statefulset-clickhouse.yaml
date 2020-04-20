@@ -38,6 +38,15 @@ spec:
       - name: {{ . | quote }}
     {{- end }}
     {{- end }}
+      initContainers:
+      - name: init
+        image: busybox:1.31.0
+        imagePullPolicy: IfNotPresent
+        args:
+        - /bin/sh
+        - -c
+        - |
+          mkdir -p /etc/clickhouse-server/metrica.d
       containers:
       - name: {{ include "clickhouse.fullname" . }}
         image: {{ .Values.clickhouse.image }}:{{ .Values.clickhouse.imageVersion }}
@@ -80,6 +89,9 @@ spec:
           mountPath: /etc/clickhouse-server/metrica.d
         - name: {{ include "clickhouse.fullname" . }}-users
           mountPath: /etc/clickhouse-server/users.d
+        securityContext:
+          privileged: true
+          runAsUser: 0
     {{- if .Values.clickhouse.imagePullSecrets }}
       imagePullSecrets: 
       - name: {{ .Values.clickhouse.imagePullSecrets }}
