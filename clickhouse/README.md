@@ -3,7 +3,7 @@
 [ClickHouse](https://clickhouse.yandex/) is an open source column-oriented database management system capable of real time generation of analytical data reports using SQL queries.
 
 ## Introduction
-This chart bootstraps a [ClickHouse](https://clickhouse.yandex/) replication cluster deployment on a [Kubernetes](http://kubernetes.io) cluster using the [Helm](https://helm.sh) package manager.
+This chart bootstraps a [ClickHouse](https://clickhouse.yandex/) replication cluster deployment on a [Kubernetes](http://kubernetes.io) cluster using the [Helm](https://helm.sh) package manager Tomer.
 
 ## Prerequisites
 
