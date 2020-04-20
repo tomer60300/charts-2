@@ -1,0 +1,26 @@
+apiVersion: v1
+entries:
+  clickhouse:
+  - apiVersion: v1
+    appVersion: "19.14"
+    created: "2020-04-20T09:02:38.551884641Z"
+    description: ClickHouse is an open source column-oriented database management
+      system capable of real time generation of analytical data reports using SQL
+      queries
+    digest: ad082627262d6490d46284827a802580cfa0dcf5c699dd34ab8ff76f83576f6e
+    home: https://clickhouse.yandex/
+    icon: https://clickhouse.yandex/images/logo.png
+    keywords:
+    - clickhouse
+    - olap
+    - database
+    maintainers:
+    - email: 411934049@qq.com
+      name: liwenhe
+    name: clickhouse
+    sources:
+    - https://github.com/liwenhe1993/charts
+    urls:
+    - https://tomer60300.github.io/charts-2/clickhouse-1.0.1.tgz
+    version: 1.0.1
+generated: "2020-04-20T09:02:38.550181427Z"
