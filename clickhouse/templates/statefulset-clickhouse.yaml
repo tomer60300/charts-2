@@ -156,7 +156,7 @@ spec:
       storageClassName: {{ .Values.clickhouse.persistentVolumeClaim.dataPersistentVolume.storageClassName | quote }}
     {{- end }}
       resources:
-        requests:
+        requests
           storage: {{ .Values.clickhouse.persistentVolumeClaim.dataPersistentVolume.storage | quote }}
 {{- end }}
 {{- if .Values.clickhouse.persistentVolumeClaim.logsPersistentVolume.enabled }}
