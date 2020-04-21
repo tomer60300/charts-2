@@ -85,12 +85,12 @@ clickhouse:
   persistentVolumeClaim:
     enabled: true
     ## Clickhouse data volume
-    dataPersistentVolume: 
+    dataPersistentVolume:
       enabled: true
       accessModes: 
       - "ReadWriteOnce"
       storageClassName: "-"
-      storage: "500Gi"
+      storage: "3Gi"
     ## Clickhouse logs volume
     logsPersistentVolume:
       enabled: false
