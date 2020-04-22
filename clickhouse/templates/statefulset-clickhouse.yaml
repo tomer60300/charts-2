@@ -94,7 +94,7 @@ spec:
       nodeSelector:
 {{ toYaml .Values.clickhouse.nodeSelector | indent 8 }}
     {{- end }}
-volumes: 
+      volumes: 
       - name: {{ include "clickhouse.fullname" . }}-data
       {{- if .Values.clickhouse.persistentVolumeClaim.dataPersistentVolume.enabled }}
         persistentVolumeClaim:
