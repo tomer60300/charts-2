@@ -91,15 +91,11 @@ spec:
       volumes: 
       - name: {{ include "clickhouse.fullname" . }}-data
       {{- if .Values.clickhouse.persistentVolumeClaim.dataPersistentVolume.enabled }}
-        persistentVolumeClaim:
-          claimName: {{ include "clickhouse.fullname" . }}-data
       {{- else }}
         emptyDir: {}
       {{- end }}
       - name: {{ include "clickhouse.fullname" . }}-logs
       {{- if .Values.clickhouse.persistentVolumeClaim.logsPersistentVolume.enabled }}
-        persistentVolumeClaim:
-          claimName: {{ include "clickhouse.fullname" . }}-logs
       {{- else }}
         emptyDir: {}
       {{- end }}
