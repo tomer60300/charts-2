@@ -3,11 +3,11 @@ entries:
   clickhouse:
   - apiVersion: v1
     appVersion: "19.14"
-    created: "2020-04-23T07:50:51.75025928Z"
+    created: "2020-04-23T08:00:58.403032529Z"
     description: ClickHouse is an open source column-oriented database management
       system capable of real time generation of analytical data reports using SQL
       queries
-    digest: d966377b141422c6536393dc6582bc4a7188ebf213542fddd1fd1fe79ddde2be
+    digest: 01a7fc84357ffa5bf88b41a307543094cc81d3fb7d67676d56bafe059d3424e8
     home: https://clickhouse.yandex/
     icon: https://clickhouse.yandex/images/logo.png
     keywords:
@@ -23,4 +23,4 @@ entries:
     urls:
     - https://tomer60300.github.io/charts-2/clickhouse-1.0.1.tgz
     version: 1.0.1
-generated: "2020-04-23T07:50:51.748643985Z"
+generated: "2020-04-23T08:00:58.400949724Z"
