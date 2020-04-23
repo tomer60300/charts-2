@@ -1,6 +1,6 @@
 apiVersion: apps/v1
 kind: StatefulSet
-metadata:
+metadata: #1
   name: {{ include "clickhouse.fullname" . }}
   labels:
     app.kubernetes.io/name: {{ include "clickhouse.name" . }}
