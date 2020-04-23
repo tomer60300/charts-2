@@ -38,6 +38,16 @@ spec:
       - name: {{ . | quote }}
     {{- end }}
     {{- end }}
+      initContainers:
+      - name: init
+        image: busybox:1.31.0
+        imagePullPolicy: IfNotPresent
+        command: ["/bin/chown", "-R", "{{ .Values.securityContext.runAsUser }}:{{ .Values.securityContext.fsGroup }}", "{{ .Values.master.persistence.path }}"]
+        securityContext:
+        command:
+          - sh
+          - -c
+          - ["/bin/chown","-R", "{{ .Values.securityContext.runAsUser }}:{{ .Values.securityContext.fsGroup }}","/etc/clickhouse-server/metrica.d"]
       containers:
       - name: {{ include "clickhouse.fullname" . }}
         image: {{ .Values.clickhouse.image }}:{{ .Values.clickhouse.imageVersion }}
