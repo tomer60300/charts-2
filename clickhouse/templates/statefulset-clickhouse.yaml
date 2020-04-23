@@ -1,12 +1,145 @@
-apiVersion: apps/v1
-kind: StatefulSet
+apiVersion: apps/v1       # master - ? ; include -> template ?  ; (OG) = Original (what was in the original statefulset-clickhouse file)
+kind: StatefulSet         # !!! = It definitely won't work.
 metadata:
-  name: {{ include "clickhouse.fullname" . }}
+  name: {{ template "clickhouse.fullname" . }}--master #  -- master ? ; template or include(OG)
   labels:
-    app.kubernetes.io/name: {{ include "clickhouse.name" . }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
-    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    app: {{ template "clickhouse.name" . }} # template or include(OG)
+    chart: {{ template "clickhouse.chart" . }} # template or include(OG)
+    release: {{.Release.Name }}
+    heritage: {{ .Release.Service }}
 spec:
+  selector:
+    matchLabels: 
+      app: {{ template "clickhouse.name" . }} # template or include(OG)
+      release: {{.Release.Name }}
+      role: master 
+    serviceName: {{ template "clickhouse.fullname" . }}-headless # template or include(OG)
+    template:
+    metadata: 
+      labels: 
+        app: {{ template "clickhouse.name" . }} # template or include(OG)
+        chart: {{ template "clickhouse.chart" . }} # template or include(OG)
+        release: {{.Release.Name }}
+        role: master
+{{- if .Values.master.podLabels }} # podLabels is None
+{{ toYaml .Values.master.podLabels | indent 8 }} 
+{{ -end }}
+{{- if and .Values.metrics.enabled .Values.metrics.podLabels }} # metrics.enabled is false
+{{ toYaml .Values.metrics.podLabels | indent 8 }}
+{{- end }}
+      annotations:
+        checksum/health: {{ include (print $.Template.BasePath "/health-configmap.yaml") . | sha256sum }} #!!! adding file !!! (Here not exist)
+        checksum/configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }} #!!! adding file !!! (Here not exist)
+        checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }} #!!! adding file !!! (Here not exist)
+      {{- if .Values.master.podAnnotations }} # podAnnotations is None
+{{ toYaml .Values.master.podAnnotations | indent 8 }}
+      {{- end }}
+      {{- if and .Values.metrics.enabled .Values.metrics.podAnnotations }} # metrics.enabled is false and podAnnotations is None
+{{ toYaml .Values.metrics.podAnnotations | indent 8 }}
+      {{- end }}
+    spec:      
+{{- include "clickhouse.imagePullSecrets" . | indent 6 }}
+      {{- if .Values.securityContext.enabled }} # securityContext.enabled is true 
+      securityContext:
+        fsGroup: {{ .Values.securityContext.fsGroup }} #fsGroup = 1001 defualt 
+        {{- if .Values.securityContext.sysctls }} # sysctls is None
+        sysctls:
+{{ toYaml .Values.securityContext.sysctls | indent 8 }}
+        {{- end }}
+      {{- end }}  # securityContext.enabled is true 
+      serviceAccountName: "{{ template "redis.serviceAccountName" . }}" #redis.serviceAccountName = defualt
+      {{- if .Values.master.priorityClassName }} # priorityClassName is Null (not exist , " #priorityClassName: {}")
+      priorityClassName: "{{ .Values.master.priorityClassName }}"
+      {{- end }}
+      {{- with .Values.master.affinity }} # affinity is None
+      affinity:
+{{ tpl (toYaml .) $ | indent 8 }}
+      {{- end }}
+      {{- if .Values.master.nodeSelector }} # nodeSelector is Null (not exist , " #nodeSelector: {}")
+      nodeSelector:
+{{ toYaml .Values.master.nodeSelector | indent 8 }}
+      {{- end }}
+      {{- if .Values.master.tolerations }} # tolerations is Null (not exist , " #tolerations: []")
+      tolerations:
+{{ toYaml .Values.master.tolerations | indent 8 }}
+      {{- end }}
+      {{- if .Values.master.schedulerName }} # schedulerName is Null (not exist , " #schedulerName: ")
+      schedulerName: "{{ .Values.master.schedulerName }}"
+      {{- end }}
+      containers:
+      - name: {{ template "clickhouse.fullname" . }} # template or include(OG)
+        image: "{{ template "clickhouse.image" . }}" # "{{ template "clickhouse.image" . }}" or {{ .Values.clickhouse.image }}:{{ .Values.clickhouse.imageVersion }}(OG)
+        imagePullPolicy: {{ .Values.image.pullPolicy | quote }} #!!! right now in .Values.clickhouse.imagePullPolicy
+        {{- if .Values.securityContext.enabled }} # securityContext.enabled is true 
+        securityContext:
+          runAsUser: {{ .Values.securityContext.runAsUser }}
+        {{- end }}      
+        command:
+        - /bin/bash
+        - -c
+        - |
+          {{- if (eq (.Values.securityContext.runAsUser | int) 0) }} # if Values.securityContext.runAsUser == 0 is false (runAsUser == 1001)
+          useradd redis
+          chown -R redis {{ .Values.master.persistence.path }}
+          {{- end }}
+          if [[ -n $REDIS_PASSWORD_FILE ]]; then #not exist in redis stateful sets Environment parameters
+            password_aux=`cat ${REDIS_PASSWORD_FILE}`
+            export REDIS_PASSWORD=$password_aux
+          fi # end REDIS_PASSWORD_FILE
+          if [[ ! -f /opt/bitnami/redis/etc/master.conf ]];then #!!! specific file Not exist all the path !!!
+            cp /opt/bitnami/redis/mounted-etc/master.conf /opt/bitnami/redis/etc/master.conf
+          fi
+          if [[ ! -f /opt/bitnami/redis/etc/redis.conf ]];then #!!! specific file Not exist all the path !!!
+            cp /opt/bitnami/redis/mounted-etc/redis.conf /opt/bitnami/redis/etc/redis.conf
+          fi
+          ARGS=("--port" "${REDIS_PORT}") #exist in redis stateful sets Environment parameters ; REDIS_PORT = 6379
+          {{- if .Values.usePassword }} # usePassword is true
+          ARGS+=("--requirepass" "${REDIS_PASSWORD}") #REDIS_PASSWORD not exist in redis stateful sets Environment parameters
+          ARGS+=("--masterauth" "${REDIS_PASSWORD}")  #REDIS_PASSWORD not exist in redis stateful sets Environment parameters
+          {{- else }}
+          ARGS+=("--protected-mode" "no")
+          {{- end }}
+          ARGS+=("--include" "/opt/bitnami/redis/etc/redis.conf") #!!! specific file Not exist all the path !!!
+          ARGS+=("--include" "/opt/bitnami/redis/etc/master.conf") #!!! specific file Not exist all the path !!!
+          {{- if .Values.master.extraFlags }} # extraFlags is NULL
+          {{- range .Values.master.extraFlags }}
+          ARGS+=({{ . | quote }})
+          {{- end }}
+          {{- end }} #if .Values.usePassword (true)
+          {{- if .Values.master.command }} # command = "/run.sh"
+          {{ .Values.master.command }} ${ARGS[@]}
+          {{- else }}
+          redis-server "${ARGS[@]}"
+          {{- end }}
+        env:
+        - name: CLICKHOUSE_REPLICATION_MODE # exist in redis stateful sets Environment parameters , REDIS_REPLICATION_MODE = master
+          value: master
+        {{- if .Values.usePassword }} # usePassword is true
+        {{- if .Values.usePasswordFile }} # usePasswordFile is false
+        - name: REDIS_PASSWORD_FILE
+          value: "/opt/bitnami/redis/secrets/redis-password" # won't work , not supposed to enter here (if is false)
+        {{- else }}
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "clickhouse.secretName" . }} # ?
+              key: {{ template "clickhouse.secretPasswordKey" . }} # ?
+        {{- end }}
+
+
+
+
+
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
   replicas: {{ .Values.clickhouse.replicas }}
   podManagementPolicy: {{ .Values.clickhouse.podManagementPolicy }}
   updateStrategy:
@@ -17,11 +150,10 @@ spec:
     rollingUpdate:
       partition: {{ .Values.clickhouse.rollingUpdatePartition }}
     {{- end }}
-  serviceName: {{ include "clickhouse.fullname" . }}-headless
-  selector: 
-    matchLabels: 
-      app.kubernetes.io/name: {{ include "clickhouse.name" . }}
-      app.kubernetes.io/instance: {{ .Release.Name }}
+  
+  
+  
+  
   template:
     metadata: 
       labels: 
