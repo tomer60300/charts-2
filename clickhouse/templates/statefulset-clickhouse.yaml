@@ -37,7 +37,6 @@ metadata: #12
       - name: {{ . | quote }}
     {{- end }}
     {{- end }}
-      serviceAccountName: "sentry10-clickhouse"
       initContainers:
       - name: "init"
         image: alpine:3.6
