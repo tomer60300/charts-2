@@ -1,6 +1,6 @@
 apiVersion: apps/v1
 kind: StatefulSet
-metadata: #12
+metadata:
   name: {{ include "clickhouse.fullname" . }}
   labels:
     app.kubernetes.io/name: {{ include "clickhouse.name" . }}
@@ -39,16 +39,14 @@ spec:
     {{- end }}
     {{- end }}
       initContainers:
-      - name: "init"
-        image: alpine:3.6
-        command:
-        - chown
-        - -R
-        - 1001090000:1001090000
-        - {{ include "clickhouse.fullpath" . }}
-        volumeMounts:
-        - name: data
-          mountPath: {{ include "clickhouse.fullpath" . }}
+      - name: init
+        image: busybox:1.31.0
+        imagePullPolicy: IfNotPresent
+        args:
+        - /bin/sh
+        - -c
+        - |
+          mkdir -p /etc/clickhouse-server/metrica.d
       containers:
       - name: {{ include "clickhouse.fullname" . }}
         image: {{ .Values.clickhouse.image }}:{{ .Values.clickhouse.imageVersion }}
@@ -91,9 +89,9 @@ spec:
           mountPath: /etc/clickhouse-server/metrica.d
         - name: {{ include "clickhouse.fullname" . }}-users
           mountPath: /etc/clickhouse-server/users.d
-        securityContext: #New
+        securityContext:
           privileged: true
-          runAsUser: 1001090000
+          runAsUser: 0
     {{- if .Values.clickhouse.imagePullSecrets }}
       imagePullSecrets: 
       - name: {{ .Values.clickhouse.imagePullSecrets }}
@@ -105,11 +103,15 @@ spec:
       volumes: 
       - name: {{ include "clickhouse.fullname" . }}-data
       {{- if .Values.clickhouse.persistentVolumeClaim.dataPersistentVolume.enabled }}
+        persistentVolumeClaim:
+          claimName: {{ include "clickhouse.fullname" . }}-data
       {{- else }}
         emptyDir: {}
       {{- end }}
       - name: {{ include "clickhouse.fullname" . }}-logs
       {{- if .Values.clickhouse.persistentVolumeClaim.logsPersistentVolume.enabled }}
+        persistentVolumeClaim:
+          claimName: {{ include "clickhouse.fullname" . }}-logs
       {{- else }}
         emptyDir: {}
       {{- end }}
