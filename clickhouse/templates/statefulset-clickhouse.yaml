@@ -6,6 +6,7 @@ metadata: #12
     app.kubernetes.io/name: {{ include "clickhouse.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
   replicas: {{ .Values.clickhouse.replicas }}
   podManagementPolicy: {{ .Values.clickhouse.podManagementPolicy }}
   updateStrategy:
@@ -46,7 +47,7 @@ metadata: #12
         - 1001090000:1001090000
         - {{ include "clickhouse.fullpath" . }}
         volumeMounts:
-        - name: {{ include "clickhouse.fullname" . }}-data
+        - name: data
           mountPath: {{ include "clickhouse.fullpath" . }}
       containers:
       - name: {{ include "clickhouse.fullname" . }}
