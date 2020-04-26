@@ -38,6 +38,17 @@ spec:
       - name: {{ . | quote }}
     {{- end }}
     {{- end }}
+      initContainers:
+      - name: "init"
+        image: alpine:3.6
+        command:
+        - chown
+        - -R
+        - 1001090000:1001090000
+        - {{ include "clickhouse.fullpath" . }}
+        volumeMounts:
+        - name: data
+          mountPath: {{ include "clickhouse.fullpath" . }}
       containers:
       - name: {{ include "clickhouse.fullname" . }}
         image: {{ .Values.clickhouse.image }}:{{ .Values.clickhouse.imageVersion }}
