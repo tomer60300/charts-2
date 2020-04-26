@@ -37,7 +37,7 @@ metadata: #12
       - name: {{ . | quote }}
     {{- end }}
     {{- end }}
-      serviceAccountName: "sentry10-clckhouse"
+      serviceAccountName: "sentry10-clickhouse"
       initContainers:
       - name: "init"
         image: alpine:3.6
@@ -46,8 +46,6 @@ metadata: #12
         - -R
         - 1001090000:1001090000
         - {{ include "clickhouse.fullpath" . }}
-        securityContext:
-          runAsUser: 0
         volumeMounts:
         - name: {{ include "clickhouse.fullname" . }}-data
           mountPath: {{ include "clickhouse.fullpath" . }}
