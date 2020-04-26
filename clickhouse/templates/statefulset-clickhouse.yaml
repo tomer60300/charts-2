@@ -49,7 +49,7 @@ metadata: #12
         securityContext:
           runAsUser: 0
         volumeMounts:
-        - name: data
+        - name: {{ include "clickhouse.fullname" . }}-data
           mountPath: {{ include "clickhouse.fullpath" . }}
       containers:
       - name: {{ include "clickhouse.fullname" . }}
