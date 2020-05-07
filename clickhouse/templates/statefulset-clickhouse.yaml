@@ -38,8 +38,8 @@ spec:
       - name: {{ . | quote }}
     {{- end }}
     {{- end }}
-{{- if .Values.serviceAccountName }}
-      serviceAccountName: {{ .Values.serviceAccountName }}
+{{- if .Values.clickhouse.serviceAccountName }}
+      serviceAccountName: {{ .Values.clickhouse.serviceAccountName }}
 {{- end }}
       initContainers:
       - name: init
