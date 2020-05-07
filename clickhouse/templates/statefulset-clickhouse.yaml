@@ -38,6 +38,9 @@ spec:
       - name: {{ . | quote }}
     {{- end }}
     {{- end }}
+{{- if .Values.serviceAccountName }}
+      serviceAccountName: {{ .Values.serviceAccountName }}
+{{- end }}
       initContainers:
       - name: init
         image: busybox:1.31.0
